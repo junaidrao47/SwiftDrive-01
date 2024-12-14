@@ -1,79 +1,202 @@
-# Backend Project Overview
+# SwiftDrive - Vehicle Rental Management System
 
-This backend project is built with Node.js and Express, connecting to a MongoDB database using Mongoose. It provides APIs for managing users, fleets, bookings, tracking, payments, and reviews.
+## Project Overview
+SwiftDrive is a comprehensive vehicle rental management system designed to provide a seamless booking and management experience for vehicle rentals.
 
-## Models
+## Technology Stack
+- **Backend**: Node.js, Express.js
+- **Database**: MongoDB, Mongoose
+- **Authentication**: JSON Web Token (JWT)
+- **Additional Libraries**: 
+  - bcryptjs (Password Hashing)
+  - nodemailer (Email Services)
+  - winston (Logging)
+  - cors (Cross-Origin Resource Sharing)
 
-### User Model
+## Project Architecture
 
-Defines user information such as username, email, password, and role.
+### Architectural Diagram
+```mermaid
+graph TD
+    A[Client] --> B[Express Server]
+    B --> C[Authentication Middleware]
+    C --> D[Routes]
+    D --> E[Controllers]
+    E --> F[Models]
+    F --> G[MongoDB Database]
+    
+    E --> H[Services]
+    H --> I[Email Service]
+    H --> J[Notification Service]
+    
+    B --> K[Utilities]
+    K --> L[Validation]
+    K --> M[Constants]
+    K --> N[Logging]
+```
 
-### Fleet Model
+## Modules and Components
 
-Represents fleet vehicles with details like type, capacity, availability, and location.
+### 1. Configuration
+- **env.js**: Manages environment variables
+- **db.js**: Handles MongoDB connection
 
-### Booking Model
+### 2. Models
+#### 2.1 User Model
+- Attributes: name, email, password, role
+- Features:
+  - Password hashing before save
+  - Unique email constraint
+  - Timestamp support
 
-Handles booking information including user ID, fleet ID, booking dates, and status.
+#### 2.2 Fleet Model
+- Attributes: model, type, price, availability, image
+- Manages vehicle inventory
 
-### Tracking Model
+#### 2.3 Booking Model
+- Attributes: user, vehicle, start/end dates, total amount, status
+- Tracks vehicle rental bookings
 
-Tracks fleet movements and statuses.
+#### 2.4 Payment Model
+- Attributes: booking, amount, payment method, status
+- Manages payment transactions
 
-### Payment Model
+#### 2.5 Review Model
+- Attributes: user, vehicle, rating, comment
+- Allows user reviews for vehicles
 
-Processes payment details for bookings.
+### 3. Controllers
+#### 3.1 User Controller
+- **Endpoints**:
+  - POST `/api/users/register`: User registration
+  - POST `/api/users/login`: User authentication
 
-### Review Model
+#### 3.2 Fleet Controller
+- **Endpoints**:
+  - POST `/api/fleet`: Add new vehicle
+  - GET `/api/fleet`: Retrieve all vehicles
 
-Stores user reviews and ratings for fleets.
+#### 3.3 Booking Controller
+- **Endpoints**:
+  - POST `/api/bookings/create`: Create booking
+  - GET `/api/bookings/all`: Retrieve user bookings
 
-## Controllers and Routes
+#### 3.4 Payment Controller
+- **Endpoints**:
+  - POST `/api/payments/process`: Process payment
+  - GET `/api/payments/history`: Retrieve payment history
+  - GET `/api/payments/:id`: Get specific payment details
 
-### User Routes (`/api/users` and `/api/auth`)
+#### 3.5 Review Controller
+- **Endpoints**:
+  - POST `/api/reviews/add`: Add vehicle review
+  - GET `/api/reviews/vehicle/:vehicleId`: Get vehicle reviews
 
-- `POST /register` - Register a new user.
-- `POST /login` - Authenticate a user.
+### 4. Middlewares
+#### 4.1 Authentication Middleware
+- JWT token verification
+- Protects routes requiring authentication
+- Attaches user information to request
 
-### Fleet Routes (`/api/fleet`)
+### 5. Services
+#### 5.1 Email Service
+- Sends transactional emails
+- Uses Nodemailer with Gmail SMTP
 
-- `GET /` - Retrieve all fleet vehicles.
-- `POST /` - Add a new fleet vehicle.
-- `GET /:id` - Retrieve a specific fleet vehicle.
-- `PUT /:id` - Update fleet information.
-- `DELETE /:id` - Remove a fleet vehicle.
+#### 5.2 Notification Service
+- Mock notification system
+- Logs notifications
 
-### Booking Routes (`/api/bookings`)
+### 6. Utilities
+#### 6.1 Constants
+- Defines enum-like constants
+- User roles
+- Booking statuses
 
-- `GET /` - Retrieve all bookings.
-- `POST /` - Create a new booking.
-- `GET /:id` - Retrieve a specific booking.
-- `PUT /:id` - Update booking details.
-- `DELETE /:id` - Cancel a booking.
+#### 6.2 Validator
+- Email format validation
+- Password strength checks
 
-### Tracking Routes (`/api/tracking`)
+#### 6.3 Logger
+- Implements logging using Winston
+- Logs to console and file
 
-- `GET /` - Get tracking information for all fleets.
-- `GET /:fleetId` - Get tracking information for a specific fleet.
+## Authentication Flow
+1. User registers with name, email, password
+2. Password is hashed before storage
+3. On login, credentials are verified
+4. JWT token generated with user ID
+5. Token used for subsequent authenticated requests
 
-### Payment Routes (`/api/payments`)
+## Error Handling
+- Centralized error handling middleware
+- Consistent error response format
+- Detailed error logging
 
-- `POST /` - Process a payment for a booking.
+## Security Measures
+- Password hashing
+- JWT authentication
+- Input validation
+- CORS configuration
+- Environment variable management
 
-### Review Routes (`/api/reviews`)
+## Setup and Installation
 
-- `GET /` - Retrieve all reviews.
-- `POST /` - Submit a new review.
-- `GET /:id` - Retrieve a specific review.
-- `PUT /:id` - Update a review.
-- `DELETE /:id` - Delete a review.
+### Prerequisites
+- Node.js (v14+)
+- MongoDB
+- Gmail account (for email service)
 
-## API Testing
+### Environment Configuration
+1. Clone the repository
+2. Create `.env` file
+3. Add required environment variables
+   ```
+   PORT=3000
+   MONGO_URI=mongodb://localhost:27017/swiftdrive
+   JWT_SECRET=your_jwt_secret
+   EMAIL_USER=your_email@gmail.com
+   EMAIL_PASS=your_email_password
+   ```
 
-API endpoints can be tested using tools like Postman:
+### Installation Steps
+```bash
+# Clone repository
+git clone https://github.com/yourusername/swiftdrive.git
 
-1. Start the server using `npm start`.
-2. Use the endpoint URLs mentioned above.
-3. For protected routes, include authentication tokens.
-4. Send appropriate HTTP requests (GET, POST, PUT, DELETE).
-5. Verify responses and handle any errors returned by the server.
+# Navigate to project directory
+cd swiftdrive
+
+# Install dependencies
+npm install
+
+# Start the server
+npm start
+```
+
+## Future Enhancements
+- Implement advanced search and filtering
+- Add admin dashboard
+- Integrate payment gateways
+- Implement real-time tracking
+- Add more comprehensive testing
+
+## Contribution Guidelines
+1. Fork the repository
+2. Create feature branch
+3. Commit changes
+4. Push to branch
+5. Create pull request
+
+## License
+MIT License
+```
+
+### Additional Notes:
+- Comprehensive project documentation
+- Clear architectural overview
+- Detailed module breakdown
+- Setup and installation instructions
+- Future enhancement roadmap
+
+Would you like me to elaborate on any specific section or create any additional documentation artifacts?
